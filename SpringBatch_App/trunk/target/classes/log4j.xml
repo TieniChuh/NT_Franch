@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="logInFileTrace"
+		class="org.apache.log4j.FileAppender">
+		<param name="file" value="/tmp/logInFile.log" />
+		<param name="encoding" value="UTF8" />
+		<layout class="org.apache.log4j.SimpleLayout" />
+	</appender>
+
+
+	<appender name="ConsoleOut"
+		class="org.apache.log4j.ConsoleAppender">
+		<param name="target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d %5p (%c:%L) - %m%n" />
+		</layout>
+	</appender> 
+
+	<appender name="ConsoleErr"
+		class="org.apache.log4j.ConsoleAppender">
+		<param name="target" value="System.err" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d %5p (%c:%L) - %m%n" />
+		</layout>
+		<!--
+			<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="FATAL" />
+			</filter>
+		-->
+	</appender>
+
+	<!-- LOGGER  -->
+
+	<!-- Print only messages of level ERROR or above in the package noModule. -->
+	<logger name="noModule" additivity="true">
+		<level value="FATAL" />
+	</logger>
+
+
+	<!-- OpenSymphony -->
+	<logger name="com.opensymphony" additivity="true"></logger>
+
+	<!-- Struts -->
+	<logger name="org.apache.struts2" additivity="true"></logger>
+
+	<logger name="org.apache.struts2.components" additivity="true">
+	</logger>
+
+
+	<logger name="ognl" additivity="true">
+		<level value="OFF" />
+	</logger>
+
+
+	<!-- Spring -->
+	<logger name="org.springframework" additivity="false" >
+		<level value="INFO"/>
+		<appender-ref ref="ConsoleOut"/>
+	</logger>
+	<!-- FWK  -->
+	<!-- context Loader -->
+	<logger name="com.inetpsa.fwk.v3.web.context.support"
+		additivity="false">
+		<level value="OFF" />
+		<appender-ref ref="ConsoleOut" />
+	</logger>
+	<logger name="com.inetpsa.fwk.v3.context" additivity="true">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.inetpsa.fwk.v3.action" additivity="true">
+		<level value="INFO" />
+	</logger>
+	<!-- logger name="com.inetpsa.fwk.v3.security" additivity="true">
+		<level value="INFO" />
+	</logger-->
+	<logger name="com.inetpsa.fwk.v3.i18n" additivity="true">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.inetpsa.fwk.v3.service" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="ConsoleOut" />
+	</logger>
+
+
+	<!-- Logger de l'application  -->
+	<logger name="com.inetpsa.mio" additivity="true">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.inetpsa.sfj" additivity="true">
+		<level value="INFO" />
+	</logger>
+
+
+	<!-- ROOT LOGGER -->
+	<root>
+		<priority value="INFO" />
+		<appender-ref ref="ConsoleErr" />
+	</root>
+
+</log4j:configuration>
+

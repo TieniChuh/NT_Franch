@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="Mic_RESTful_001">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="jersey-server-1.17.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/jersey-server-1.17.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jsr311-api-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/jsr311-api-1.1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jersey-core-1.17.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/jersey-core-1.17.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jersey-servlet-1.17.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/jersey-servlet-1.17.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="asm-4.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/asm-4.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jersey-client-1.17.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/jersey-client-1.17.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="cglib-3.2.5.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/Mic_RESTful_001/WebContent/WEB-INF/lib/cglib-3.2.5.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="Mic_RESTful_001"/>
+        <property name="java-output-path" value="/Mic_RESTful_001/build/classes"/>
+    </wb-module>
+</project-modules>

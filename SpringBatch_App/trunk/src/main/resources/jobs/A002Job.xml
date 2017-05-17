@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/util
+                http://www.springframework.org/schema/util/spring-util.xsd
+                http://www.springframework.org/schema/batch
+                http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <bean class="com.mic.exp.batch.common.utils.SpringPropertiesUtil">
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="locations">
+            <list>
+                <value>classpath:A002.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+        <property name="keys" value="nbLinesRead" />
+    </bean>
+
+    <!-- Import of the commons -->
+    <import resource="classpath:commons-batch.xml" />
+
+    <!-- The batch spring conf -->
+    <batch:step id="a002Test">
+        <batch:tasklet>
+            <batch:chunk reader="a002Reader" processor="a002Processor" writer="a002Writer" commit-interval="100">
+                <batch:streams>
+                    <batch:stream ref="outputFileActorDtoWriter" />
+                    <batch:stream ref="outputFileContractDtoWriter" />
+                    <batch:stream ref="outputFileScheduleDtoWriter" />
+                </batch:streams>
+            </batch:chunk>
+            <batch:listeners>
+                <batch:listener ref="a002ProcessorListener" />
+            </batch:listeners>
+        </batch:tasklet>
+        <batch:listeners>
+            <batch:listener ref="promotionListener" />
+        </batch:listeners>
+    </batch:step>
+
+    <batch:job id="a002Job" job-repository="jobRepository">
+        <batch:step id="a002StepStart">
+            <batch:tasklet ref="a002TaskletStart" transaction-manager="transactionManager" />
+            <batch:next on="FAILED" to="a002StepFailed" />
+            <batch:next on="*" to="a002TestStep" />
+        </batch:step>
+        <batch:step id="a002TestStep" parent="a002Test">
+            <batch:next on="FAILED" to="a002StepFailed" />
+            <batch:next on="*" to="a002StepCompleted" />
+        </batch:step>
+        <batch:step id="a002StepCompleted">
+            <batch:tasklet ref="a002TaskletCompleted" transaction-manager="transactionManager" />
+        </batch:step>
+        <batch:step id="a002StepFailed">
+            <batch:tasklet ref="a002TaskletFailed" transaction-manager="transactionManager" />
+        </batch:step>
+    </batch:job>
+
+    <!--======================================================= -->
+    <!-- TASKLET BEANS -->
+    <!--======================================================= -->
+    <bean id="a002TaskletStart" class="com.mic.exp.batch.tasklet.A002TaskletStart" scope="step">
+        <!-- <property name="batchService" ref="batchService" /> -->
+    </bean>
+
+    <bean id="a002Reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="resource" value="file:${mic.batch.a002.fileInput_1}" />
+        <property name="comments" value="F" />
+        <property name="linesToSkip" value="1" />
+        <property name="lineMapper" ref="orderFileLineMapper">
+        </property>
+    </bean>
+
+    <bean id="orderFileLineMapper" class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper">
+        <property name="tokenizers">
+            <map>
+                <entry key="I*" value-ref="actorLineTokenizer" />
+                <entry key="C*" value-ref="contractLineTokenizer" />
+                <entry key="S*" value-ref="scheduleLineTokenizer" />
+            </map>
+        </property>
+        <property name="fieldSetMappers">
+            <map>
+                <entry key="I*" value-ref="actorFieldSetMapper" />
+                <entry key="C*" value-ref="contractFieldSetMapper" />
+                <entry key="S*" value-ref="scheduleFieldSetMapper" />
+            </map>
+        </property>
+    </bean>
+    <bean id="actorFieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+        <property name="targetType" value="com.mic.exp.batch.dto.a002.A002InputActorDto" />
+    </bean>
+    <bean id="contractFieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+        <property name="targetType" value="com.mic.exp.batch.dto.a002.A002InputContractDto" />
+    </bean>
+    <bean id="scheduleFieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+        <property name="targetType" value="com.mic.exp.batch.dto.a002.A002InputScheduleDto" />
+    </bean>
+    <bean id="actorLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+        <property name="strict" value="false" />
+        <property name="delimiter" value=";" />
+        <property name="names"
+            value="type,colInputActor001,colInputActor002,colInputActor003,colInputActor004,colInputActor005,colInputActor006,colInputActor007,colInputActor008,colInputActor009,colInputActor010" />
+    </bean>
+    <bean id="contractLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+        <property name="strict" value="false" />
+        <property name="delimiter" value=";" />
+        <property name="names"
+            value="type,colInputContract001,colInputContract002,colInputContract003,colInputContract004,colInputContract005,colInputContract006,colInputContract007,colInputContract008,colInputContract009,colInputContract010" />
+    </bean>
+    <bean id="scheduleLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+        <property name="strict" value="false" />
+        <property name="delimiter" value=";" />
+        <property name="names"
+            value="type,colInputSchedule001,colInputSchedule002,colInputSchedule003,colInputSchedule004,colInputSchedule005,colInputSchedule006,colInputSchedule007,colInputSchedule008,colInputSchedule009,colInputSchedule010" />
+    </bean>
+
+
+
+
+
+    <bean id="a002ProcessorListener" class="com.mic.exp.batch.listener.A002ProcessorListener">
+        <property name="process" ref="a002Processor"></property>
+    </bean>
+
+    <bean id="a002Processor" class="com.mic.exp.batch.processor.A002Processor" />
+
+    <!-- ########################################a002Writer -->
+    <bean id="a002Writer" class="com.mic.exp.batch.writer.A002Writer">
+        <property name="delegates">
+            <list>
+                <ref bean="outputFileActorDtoWriter" />
+                <ref bean="outputFileContractDtoWriter" />
+                <ref bean="outputFileScheduleDtoWriter" />
+            </list>
+        </property>
+    </bean>
+<!-- Output  stream -->
+ 
+ 
+ 
+ 
+    <bean id="outputFileActorDtoWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+        <property name="appendAllowed" value="true" />
+        <property name="resource" value="file:${mic.batch.a002.fileOutput_1}" />
+        <property name="encoding" value="ISO-8859-15" />
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=";" />
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names"
+           value="outColActor001,outColActor002,outColActor003,outColActor004,outColActor005,outColActor006,outColActor007,outColActor008,outColActor009,outColActor010" />
+                    </bean>
+                </property>
+
+            </bean>
+        </property>
+    </bean>
+    <bean id="outputFileContractDtoWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+        <property name="appendAllowed" value="true" />
+        <property name="resource" value="file:${mic.batch.a002.fileOutput_2}" />
+        <property name="encoding" value="ISO-8859-15" />
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=";" />
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names"
+            value="outColContract001,outColContract002,outColContract003,outColContract004,outColContract005,outColContract006,outColContract007,outColContract008,outColContract009,outColContract010" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean id="outputFileScheduleDtoWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+        <property name="appendAllowed" value="true" />
+        <property name="resource" value="file:${mic.batch.a002.fileOutput_3}" />
+        <property name="encoding" value="ISO-8859-15" />
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=";" />
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names"
+            value="outColSchedule001,outColSchedule002,outColSchedule003,outColSchedule004,outColSchedule005,outColSchedule006,outColSchedule007,outColSchedule008,outColSchedule009,outColSchedule010" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="a002TaskletCompleted" class="com.mic.exp.batch.tasklet.A002TaskletCompleted" scope="step">
+       <!--  <property name="batchService" ref="batchService" />--> 
+    </bean>
+    <bean id="a002TaskletFailed" class="com.mic.exp.batch.tasklet.A002TaskletFailed" scope="step">
+         <!--   <property name="batchService" ref="batchService" />--> 
+    </bean>
+
+</beans>

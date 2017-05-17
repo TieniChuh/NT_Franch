@@ -1,0 +1,76 @@
+<h2>Personal Reactive Form</h2>
+
+<form (ngSubmit)="submitForm()" [formGroup]="contactForm" novalidate>
+  <div class="form-content">
+
+    <label>
+      Name:
+      <input type="text" formControlName="name" class="sd-form-control" placeholder="Enter your name..">
+    </label>
+    <label>
+      Email:
+      <input type="email" formControlName="email" class="sd-form-control" placeholder="Enter your email.">
+    </label>
+    <label>
+      Content:
+      <textarea formControlName="content" class="sd-form-control" placeholder="Content here."></textarea>
+    </label>
+    <div class="form-submit">
+      <button type="submit">Submit</button>
+    </div>
+  </div>
+</form>
+<div>
+
+  <input type="text" [value]="logName" (input)="name=$event.target.value" [placeholder]="firstNamePlaceholder"/>
+  <h1> Hello , {{logName}}</h1>
+
+  <!-- phone refers to the input element; pass its `value` to an event handler -->
+  <input #phone placeholder="phone number">
+  <button (click)="callPhone(phone.value)">Call</button>
+
+  <button (click)="doSomething($event)" >点击</button>
+  <ul>
+    <li *ngFor="let item of items">{{item}}{{i}}</li>
+  </ul>
+  <div class="four wide column center aligned votes">
+    <div class="ui statistic">
+      <div class="value"> {{ votes }}
+      </div>
+      <div class="label">
+        Points
+      </div>
+    </div>
+  </div>
+  <div class="twelve wide column">
+    <a class="ui large header" href="{{ link }}"> {{ title }}
+    </a>
+    <ul class="ui big horizontal list voters">
+      <li class="item">
+        <a href (click)="voteUp()">
+          <i class="arrow up icon"></i> upvote
+        </a>
+      </li>
+      <li class="item">
+        <a href (click)="voteDown()">
+          <i class="arrow down icon"></i>
+          downvote
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="form-value">
+  Form value:
+  <pre>
+    {{contactForm.value | json}}
+  </pre>
+  <p>
+    Status: {{contactForm.status}}
+  </p>
+  <p>
+    Valid: {{contactForm.valid}}
+  </p>
+  <p>Submit then open console to see full form.</p>
+</div>
+

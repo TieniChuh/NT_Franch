@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/util
+                http://www.springframework.org/schema/util/spring-util.xsd
+                http://www.springframework.org/schema/batch
+                http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+    <bean class="com.mic.exp.batch.common.utils.SpringPropertiesUtil">
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="locations">
+            <list>
+                <value>classpath:A001.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+        <property name="keys" value="nbLinesRead" />
+    </bean>
+
+    <!-- Import of the commons -->
+    <import resource="classpath:commons-batch.xml" />
+
+    <!-- The batch spring conf -->
+    <batch:step id="a001Test">
+        <batch:tasklet>
+            <batch:chunk reader="a001Reader" processor="a001Processor" writer="a001Writer" commit-interval="100">
+            </batch:chunk>
+            <batch:listeners>
+                <batch:listener ref="a001ProcessorListener" />
+            </batch:listeners>
+        </batch:tasklet>
+        <batch:listeners>
+            <batch:listener ref="promotionListener" />
+        </batch:listeners>
+    </batch:step>
+
+    <batch:job id="a001Job" job-repository="jobRepository">
+        <batch:step id="a001StepStart">
+            <batch:tasklet ref="a001TaskletStart" transaction-manager="transactionManager" />
+            <batch:next on="FAILED" to="a001StepFailed" />
+            <batch:next on="*" to="a001TestStep" />
+        </batch:step>
+        <batch:step id="a001TestStep" parent="a001Test">
+            <batch:next on="FAILED" to="a001StepFailed" />
+            <batch:next on="*" to="a001StepCompleted" />
+        </batch:step>
+        <batch:step id="a001StepCompleted">
+            <batch:tasklet ref="a001TaskletCompleted" transaction-manager="transactionManager" />
+        </batch:step>
+        <batch:step id="a001StepFailed">
+            <batch:tasklet ref="a001TaskletFailed" transaction-manager="transactionManager" />
+        </batch:step>
+    </batch:job>
+
+    <!--======================================================= -->
+    <!-- TASKLET BEANS -->
+    <!--======================================================= -->
+    <bean id="a001TaskletStart" class="com.mic.exp.batch.tasklet.A001TaskletStart" scope="step">
+        <!-- <property name="batchService" ref="batchService" /> -->
+    </bean>
+
+    <bean id="a001Reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="resource" value="file:${mic.batch.a001.fileInput}" />
+        <property name="linesToSkip" value="1" />
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="fieldSetMapper">
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+                        <property name="targetType" value="com.mic.exp.batch.dto.a001.A001InputDto" />
+                    </bean>
+                </property>
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="strict" value="false" />
+                        <property name="delimiter" value=";" />
+                        <property name="names" value="col001,col002,col003,col004,col005,col006,col007,col008,col009,col010" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean id="a001ProcessorListener" class="com.mic.exp.batch.listener.A001ProcessorListener">
+        <property name="process" ref="a001Processor"></property>
+    </bean>
+
+    <bean id="a001Processor" class="com.mic.exp.batch.processor.A001Processor" />
+
+    <!-- ########################################a001Writer -->
+    <bean id="a001Writer" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+        <property name="appendAllowed" value="true" />
+        <property name="resource" value="file:${mic.batch.a001.fileOutput}" />
+        <property name="encoding" value="ISO-8859-15" />
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value=";" />
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names"
+                            value="outCol001,outCol002,outCol003,outCol004,outCol005,outCol006,outCol007,outCol008,outCol009,outCol010" />
+                    </bean>
+                </property>
+
+            </bean>
+        </property>
+    </bean>
+
+
+    <bean id="a001TaskletCompleted" class="com.mic.exp.batch.tasklet.A001TaskletCompleted" scope="step">
+        <!-- <property name="batchService" ref="batchService" /> -->
+    </bean>
+    <bean id="a001TaskletFailed" class="com.mic.exp.batch.tasklet.A001TaskletFailed" scope="step">
+        <!--<property name="batchService" ref="batchService" /> -->
+    </bean>
+
+</beans>

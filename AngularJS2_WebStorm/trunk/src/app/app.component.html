@@ -1,0 +1,89 @@
+<h3>
+  Angular 2 Seed
+</h3>
+<nav>
+	<a [routerLink]="['/home']" routerLinkActive="active">
+    Home
+  </a>
+  |
+	<a [routerLink]="['/about']" routerLinkActive="active">
+    About
+  </a>
+  |
+	<a [routerLink]="['/github', 'angular']" routerLinkActive="active">
+    Github Repos
+  </a>
+  |
+	<a [routerLink]="['/contact']" routerLinkActive="active">
+    Contact Us
+  </a>
+    |
+    <a [routerLink]="['/personal']" routerLinkActive="active">
+        Personal
+    </a>
+  |
+  <a [routerLink]="['/todo/list']" routerLinkActive="active">
+    Todo
+  </a>
+  |  <a routerLink='/template-forms' routerLinkActive="active">Template Driven Forms</a>  | <a routerLink='/reactive-forms' routerLinkActive="active">Reactive Forms</a>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Driven_Forms<strong class="caret"></strong></a>
+    <ul class="dropdown-menu">
+      <li>
+        <a routerLink='/template-forms'>Template Driven Forms</a>
+      </li>
+      <li>
+        <a routerLink='/reactive-forms'>Reactive Forms</a>
+      </li>
+    </ul>
+  </li>
+
+</nav>
+<div class="container">
+  <div class="row clearfix">
+    <div class="col-md-12 column">
+      <nav class="navbar navbar-default" role="navigation">
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown<strong class="caret"></strong></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#">Action</a>
+                </li>
+                <li>
+                  <a href="#">Another action</a>
+                </li>
+                <li>
+                  <a href="#">Something else here</a>
+                </li>
+                <li class="divider">
+                </li>
+                <li>
+                  <a href="#">Separated link</a>
+                </li>
+                <li class="divider">
+                </li>
+                <li>
+                  <a href="#">One more separated link</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+        </div>
+
+      </nav>
+    </div>
+  </div>
+</div>
+<main>
+	<router-outlet></router-outlet>
+</main>
+
+
+<footer>
+  © 2016
+</footer>
